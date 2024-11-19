@@ -1,18 +1,20 @@
 notes = ('C', 'C#', 'D', 'D#','E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
-# major_scale = (2,2,1,2,2,2,1)
-# minor_scale = (2,1,2,2,1,2,2)
-# major_pentatonic = (2,2,3,2,3)
-# minor_pentatonic = (3,2,2,3,2)
-# blues_scale = (3,2,1,1,3,2)
 scales_formulas = {
-        'major': (2,2,1,2,2,2,1),
-        'minor': (2,1,2,2,1,2,2),
-        'major_pentatonic': (2,2,3,2,3),
-        'minor_pentatonic': (3,2,2,3,2),
-        'blues': (3,2,1,1,3,2)
+        'major scale': (2,2,1,2,2,2,1),
+        'minor scale': (2,1,2,2,1,2,2),
+        'major pentatonic scale': (2,2,3,2,3),
+        'minor pentatonic scale': (3,2,2,3,2),
+        'blues scale': (3,2,1,1,3,2)
         }
-class Scale:
-    
+chords_formulas = {
+    'major chord': (4,7),
+    'minor chord': (3,7),
+    'dominant 7 chord': (4,7,10),
+    'power chord': (7),
+    'sus2 chord': (2,7),
+    'sus4 chord': (5,7)
+}
+class Notes:
     def __init__(self, note, type):
         self.note = note
         self.type = type
@@ -26,11 +28,21 @@ class Scale:
           note_pos %= len(notes)
           scale_list.append(notes[note_pos])
         return scale_list
+    
+    def build_chord(self):
+        chord_list = []
+        chord_list.append(self.note)
+        note_pos = notes.index(self.note)
+        for interval in chords_formulas[self.type]:
+          note_pos += interval
+          note_pos %= len(notes)
+          chord_list.append(notes[note_pos])
+          note_pos = notes.index(self.note)
+        return chord_list
 
-class Chord:
-    def __init__(self, note):
-        self.note = note
-    pass
+    def related_chords(self):
+        pass
+    
 class GuitarNotation:
     pass
 
@@ -40,11 +52,19 @@ def Builder():
       print ('There isn\'t such note')
       user_input = input('Please, choose the root note: ')
 
-  print ('What are you want to construct?' + ' You can choose from major/minor scale with penta/hepta option or blues scale')
-  scale_or_chord = input('Please, type lowercases only: ')
-  if scale_or_chord == 'major scale':
-    user_scale = Scale(user_input, 'major')
+  typo_filter = [scale for scale in scales_formulas] + [chord for chord in chords_formulas]
+  user_progression = (input('What do you want to construct? ')).lower()
+
+  while user_progression not in typo_filter:
+     user_progression = (input('What do you want to construct? ')).lower()
+  
+  if 'scale' in user_progression:
+    user_scale = Notes(user_input, user_progression)
     print(user_scale.build_scale())
+  
+  if 'chord' in user_progression:
+     user_chord = Notes(user_input, user_progression)
+     print(user_chord.build_chord())
 
 notes_string = ''
 for note in notes:
